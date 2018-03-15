@@ -28,7 +28,25 @@ const legend = d3.legendColor()
     .classPrefix('legend');
 
 
-d3.json('top50.json', function (error, graph) {
+d3.json('top50-michelly.json', function (error, graph) {
+
+    var nodes = (graph.items).map((e) => ({"id": e.id, "name": e.name, "genres": e.genres, "img": e.images[2].url, "url": e.external_urls.spotify}))
+    var edges = []
+
+    for(var i = 0; i < nodes.length; i++){
+      for(var j = i+1; j < nodes.length; j++){
+        var common = common = $.grep(nodes[i].genres, function(element) {
+                              return $.inArray(element, nodes[j].genres ) !== -1;});
+
+        if(common.length > 0){
+          edges.push({"source": nodes[i].id, "target": nodes[j].id, "type": common.includes("mpb")? "mpb": common[0]})
+        }
+      }
+    }
+
+    graph = {"nodes": nodes, "edges": edges}
+
+
     if (error) throw error;
 
     const types = d3.set(graph.edges.map(e => e.type)).values();
